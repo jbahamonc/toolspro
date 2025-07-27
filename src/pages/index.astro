@@ -1,0 +1,94 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ToolCard from '../components/ToolCard.astro';
+import FAQSection from '../components/FAQSection.astro';
+import '../styles/global.css';
+
+const tools = [
+  {
+    title: 'Contador de Palabras',
+    description: 'Cuenta palabras y caracteres al instante',
+    iconName: 'ph ph-calculator',
+    href: '/contador-de-palabras'
+  },
+  {
+    title: 'Convertidor de Mayúsculas',
+    description: 'Convierte texto entre mayúsculas y minúsculas',
+    iconName: 'ph ph-text-aa',
+    href: '/convertidor-mayusculas'
+  },
+  {
+    title: 'Eliminar Duplicados',
+    description: 'Elimina líneas duplicadas en tu texto',
+    iconName: 'ph ph-copy',
+    href: '/eliminar-duplicados'
+  },
+  {
+    title: 'Ordenar Líneas',
+    description: 'Ordena líneas alfabéticamente',
+    iconName: 'ph ph-sort-ascending',
+    href: '/ordenar-lineas'
+  },
+  {
+    title: 'Limpiador de Espacios',
+    description: 'Elimina espacios y saltos de línea extra',
+    iconName: 'ph ph-broom',
+    href: '/limpiar-espacios'
+  },
+  {
+    title: 'Reemplazar Texto',
+    description: 'Busca y reemplaza texto fácilmente',
+    iconName: 'ph ph-arrows-left-right',
+    href: '/reemplazar-texto'
+  },
+  {
+    title: 'Lorem Ipsum',
+    description: 'Genera texto de relleno Lorem Ipsum',
+    iconName: 'ph ph-text-columns',
+    href: '/lorem-ipsum'
+  },
+  {
+    title: 'Invertir Texto',
+    description: 'Invierte el orden de los caracteres',
+    iconName: 'ph ph-arrows-counter-clockwise',
+    href: '/invertir-texto'
+  }
+];
+
+const faqs = [
+  {
+    question: '¿Cómo funciona TextoPro.lat?',
+    answer: 'TextoPro.lat es una colección de herramientas gratuitas para manipular texto. Simplemente selecciona la herramienta que necesitas, pega tu texto y obtén el resultado al instante.'
+  },
+  {
+    question: '¿Es seguro usar TextoPro.lat?',
+    answer: 'Sí, es completamente seguro. Todo el procesamiento se realiza en tu navegador y nunca almacenamos tu texto. Tu privacidad es nuestra prioridad.'
+  },
+  {
+    question: '¿Puedo usar TextoPro.lat en mi móvil?',
+    answer: 'Sí, todas nuestras herramientas son totalmente responsivas y funcionan perfectamente en dispositivos móviles.'
+  }
+];
+
+const title = "TextoPro.lat | Herramientas de Texto Online Gratuitas";
+const description = "Herramientas de texto online gratuitas: contador de palabras, convertidor de mayúsculas, eliminar duplicados y más. ¡Rápido y fácil de usar!";
+---
+
+<Layout title={title} description={description}>
+    <section class="tools-section">
+      <h2>Herramientas de <span class="highlight">Texto</span></h2>
+      <div class="tools-grid">
+        {tools.map(tool => (
+          <ToolCard
+            title={tool.title}
+            description={tool.description}
+            iconName={tool.iconName}
+            href={tool.href}
+          />
+        ))}
+      </div>
+    </section>
+
+    <FAQSection faqs={faqs} />
+  </main>
+</Layout>

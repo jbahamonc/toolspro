@@ -1,0 +1,66 @@
+---
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{title}</title>
+  <meta name="description" content={description}>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body>
+  <header class="header">
+    <div class="header-container">
+      <a href="/" class="logo-link">
+        <img src="/logo.png" alt="TextoPro.lat" class="logo" />
+      </a>
+      <div class="header-actions">
+        <!-- Aquí puedes agregar botones de acción si son necesarios -->
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <slot />
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-section">
+        <a href="/" class="footer-logo">
+          <img src="/logo.png" alt="TextoPro.lat" class="logo" />
+        </a>
+        <p class="footer-description">
+          Herramientas gratuitas de manipulación de texto diseñadas para simplificar tu trabajo diario. Rápidas, seguras y fáciles de usar.
+        </p>
+      </div>
+
+      <div class="footer-section">
+        <h3 class="footer-title">Herramientas</h3>
+        <ul class="footer-services">
+          <li><a href="/contador-de-palabras">Contador de Palabras</a></li>
+          <li><a href="/convertidor-mayusculas">Convertidor de Mayúsculas</a></li>
+          <li><a href="/eliminar-duplicados">Eliminar Duplicados</a></li>
+          <li><a href="/ordenar-lineas">Ordenar Líneas</a></li>
+          <li><a href="/limpiar-espacios">Limpiador de Espacios</a></li>
+          <li><a href="/reemplazar-texto">Reemplazar Texto</a></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="container">
+        <p class="copyright">&copy; {new Date().getFullYear()} TextoPro.lat - Todos los derechos reservados</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

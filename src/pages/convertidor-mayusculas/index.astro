@@ -1,0 +1,143 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Convertidor de Mayúsculas y Minúsculas | TextoPro.lat";
+const description = "Convierte fácilmente tu texto entre mayúsculas, minúsculas, tipo título y tipo oración. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Convertidor de Mayúsculas";
+const toolDescription = "Transforma tu texto al instante entre diferentes estilos de capitalización. Ideal para títulos, textos formales y más.";
+---
+
+<Layout title={title} description={description}>
+  <div class="tool-container">
+    <ToolHeader
+      title={toolTitle}
+      description={toolDescription}
+      iconName="ph ph-text-aa"
+    />
+
+    <section class="tool-content">
+      <div class="textarea-wrapper">
+        <textarea 
+          id="text-input"
+          class="text-input"
+          placeholder="Escribe o pega tu texto aquí..."
+          rows="8"
+        ></textarea>
+      </div>
+
+      <div class="actions-group">
+        <button class="action-button" data-action="uppercase">
+          <i class="ph ph-text-aa"></i>
+          MAYÚSCULAS
+        </button>
+        <button class="action-button" data-action="lowercase">
+          <i class="ph ph-text-aa"></i>
+          minúsculas
+        </button>
+        <button class="action-button" data-action="titlecase">
+          <i class="ph ph-text-aa"></i>
+          Tipo Título
+        </button>
+        <button class="action-button" data-action="sentencecase">
+          <i class="ph ph-text-aa"></i>
+          Tipo Oración
+        </button>
+      </div>
+
+      <div class="textarea-actions">
+        <button id="clear-button" class="button-clear">
+          <i class="ph ph-trash"></i>
+          Limpiar texto
+        </button>
+      </div>
+
+      <div class="output-section">
+        <div class="output-header">
+          <h3>Resultado</h3>
+          <button id="copy-button" class="button-copy" title="Copiar al portapapeles">
+            <i class="ph ph-copy"></i>
+            Copiar texto
+          </button>
+        </div>
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-output"
+            class="text-input output"
+            placeholder="El texto convertido aparecerá aquí..."
+            rows="8"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
+  const clearButton = document.getElementById('clear-button');
+  const actionButtons = document.querySelectorAll('.action-button');
+
+  function toTitleCase(str: string) {
+    return str.toLowerCase().split(' ').map(word => {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+  }
+
+  function toSentenceCase(str: string) {
+    return str.toLowerCase().replace(/(^\w|\.\s+\w)/g, letter => letter.toUpperCase());
+  }
+
+  const textOutput = document.getElementById('text-output') as HTMLTextAreaElement;
+  const copyButton = document.getElementById('copy-button');
+
+  if (textInput && clearButton && textOutput && copyButton) {
+    // Manejador para el botón de limpiar
+    clearButton.addEventListener('click', () => {
+      textInput.value = '';
+      textOutput.value = '';
+    });
+
+    // Manejador para el botón de copiar
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textOutput.value);
+        copyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+        }, 2000);
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+
+    // Manejadores para los botones de conversión
+    actionButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        const action = button.getAttribute('data-action');
+        const text = textInput.value;
+        let result = '';
+
+        switch (action) {
+          case 'uppercase':
+            result = text.toUpperCase();
+            break;
+          case 'lowercase':
+            result = text.toLowerCase();
+            break;
+          case 'titlecase':
+            result = toTitleCase(text);
+            break;
+          case 'sentencecase':
+            result = toSentenceCase(text);
+            break;
+        }
+
+        textOutput.value = result;
+      });
+    });
+  }
+</script>

@@ -1,0 +1,98 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Contador de Palabras y Caracteres | TextoPro.lat";
+const description = "Cuenta palabras y caracteres en tu texto al instante. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Contador de Palabras y Caracteres";
+const toolDescription = "Pega tu texto y obtén estadísticas instantáneas sobre el número de palabras y caracteres.";
+---
+
+<Layout title={title} description={description}>
+    <div class="tool-container">
+      <ToolHeader
+        title={toolTitle}
+        description={toolDescription}
+        iconName="ph ph-text-columns"
+      />
+
+      <section class="tool-content">
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-input"
+            class="text-input"
+            placeholder="Pega o escribe tu texto aquí..."
+            rows="12"
+          ></textarea>
+          <div class="textarea-actions">
+            <button id="clear-button" class="button-clear">
+              <i class="ph ph-trash"></i>
+              Limpiar texto
+            </button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h3 class="stat-title">
+              Palabras
+            </h3>
+            <p class="stat-value" id="word-count">0</p>
+          </div>
+
+          <div class="stat-card">
+            <h3 class="stat-title">
+              Caracteres (con espacios)
+            </h3>
+            <p class="stat-value" id="char-count-with-spaces">0</p>
+          </div>
+
+          <div class="stat-card">
+            <h3 class="stat-title">
+              Caracteres (sin espacios)
+            </h3>
+            <p class="stat-value" id="char-count-no-spaces">0</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</Layout>
+
+<script>
+    const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
+    const wordCount = document.getElementById('word-count')!;
+    const charCountWithSpaces = document.getElementById('char-count-with-spaces')!;
+    const charCountNoSpaces = document.getElementById('char-count-no-spaces')!;
+
+    if (textInput && wordCount && charCountWithSpaces && charCountNoSpaces) {
+      function updateCounts() {
+        const text = textInput.value;
+        
+        // Contar palabras (dividir por espacios y filtrar elementos vacíos)
+        const words = text.trim().split(/\s+/).filter(word => word.length > 0);
+        wordCount.textContent = words.length.toString();
+        
+        // Contar caracteres con espacios
+        charCountWithSpaces.textContent = text.length.toString();
+        
+        // Contar caracteres sin espacios
+        charCountNoSpaces.textContent = text.replace(/\s/g, '').length.toString();
+      }
+
+      textInput.addEventListener('input', updateCounts);
+      
+      // Funcionalidad del botón limpiar
+      const clearButton = document.getElementById('clear-button');
+      if (clearButton) {
+        clearButton.addEventListener('click', () => {
+          textInput.value = '';
+          updateCounts();
+        });
+      }
+    }
+  </script>
+</body>
+</html>

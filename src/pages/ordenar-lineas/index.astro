@@ -1,0 +1,336 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Ordenador de Líneas | TextoPro.lat";
+const description = "Ordena alfabéticamente las líneas de tu texto de forma ascendente o descendente. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Ordenador de Líneas";
+const toolDescription = "Organiza tu lista de texto en orden alfabético. Ordena de A a Z o de Z a A con un solo clic.";
+---
+
+<Layout title={title} description={description}>
+  <div class="tool-container">
+    <ToolHeader
+      title={toolTitle}
+      description={toolDescription}
+      iconName="ph ph-sort-ascending"
+    />
+
+    <section class="tool-content">
+      <div class="tabs">
+        <button class="tab-button active" data-tab="text">
+          <i class="ph ph-text-columns"></i>
+          Pegar Texto
+        </button>
+        <button class="tab-button" data-tab="file">
+          <i class="ph ph-file-csv"></i>
+          Subir Archivo CSV
+        </button>
+      </div>
+
+      <div class="tab-content" id="text-tab">
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-input"
+            class="text-input"
+            placeholder="Pega aquí tu lista de texto..."
+            rows="8"
+          ></textarea>
+        </div>
+
+        <div class="actions-group">
+          <button id="sort-asc-button" class="action-button primary">
+            <i class="ph ph-sort-ascending"></i>
+            Ordenar A-Z
+          </button>
+          <button id="sort-desc-button" class="action-button">
+            <i class="ph ph-sort-descending"></i>
+            Ordenar Z-A
+          </button>
+        </div>
+
+        <div class="output-section" style="display: none;">
+          <div class="output-header">
+            <div class="output-stats">
+              <span id="line-count" class="stat">0 líneas ordenadas</span>
+            </div>
+            <button id="copy-button" class="button-copy" title="Copiar al portapapeles">
+              <i class="ph ph-copy"></i>
+              Copiar texto
+            </button>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea 
+              id="text-output"
+              class="text-input output"
+              placeholder="El texto ordenado aparecerá aquí..."
+              rows="8"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="file-tab" style="display: none;">
+        <div class="file-upload-area">
+          <i class="ph ph-file-csv"></i>
+          <p>Arrastra y suelta tu archivo CSV aquí o</p>
+          <label for="file-input" class="file-input-label">Selecciona un archivo</label>
+          <input 
+            type="file" 
+            id="file-input" 
+            accept=".csv" 
+            style="display: none;"
+          >
+          <p class="file-info">Tamaño máximo: 5MB</p>
+          <button id="csv-clear-button" class="action-button button-clear">
+            <i class="ph ph-trash"></i>
+            Limpiar
+          </button>
+        </div>
+
+        <div class="output-section" style="display: none; margin-top: 2rem;">
+          <div class="output-header">
+            <div class="output-stats">
+              <span id="csv-line-count" class="stat">0 líneas ordenadas</span>
+            </div>
+            <div class="button-group" style="display: flex; gap: 0.5rem;">
+              <button id="csv-copy-button" class="button-copy" title="Copiar al portapapeles">
+                <i class="ph ph-copy"></i>
+                Copiar texto
+              </button>
+              <a id="csv-download-button" class="button-copy" download="lineas-ordenadas.csv" href="#" style="display: none;">
+                <i class="ph ph-download"></i>
+                Descargar CSV
+              </a>
+            </div>
+          </div>
+          <div class="textarea-wrapper">
+            <textarea 
+              id="csv-output"
+              class="text-input output"
+              placeholder="Las líneas ordenadas aparecerán aquí..."
+              rows="8"
+              readonly
+            ></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  // Elementos de la pestaña de texto
+  const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
+  const textOutput = document.getElementById('text-output') as HTMLTextAreaElement;
+  const sortAscButton = document.getElementById('sort-asc-button') as HTMLButtonElement;
+  const sortDescButton = document.getElementById('sort-desc-button') as HTMLButtonElement;
+  const copyButton = document.getElementById('copy-button') as HTMLButtonElement;
+  const outputSection = document.querySelector('#text-tab .output-section') as HTMLElement;
+  const lineCount = document.getElementById('line-count') as HTMLSpanElement;
+
+  // Elementos de la pestaña CSV
+  const fileInput = document.getElementById('file-input') as HTMLInputElement;
+  const dropZone = document.querySelector('.file-upload-area') as HTMLDivElement;
+  const csvOutputSection = document.querySelector('#file-tab .output-section') as HTMLElement;
+  const csvOutput = document.getElementById('csv-output') as HTMLTextAreaElement;
+  const csvLineCount = document.getElementById('csv-line-count') as HTMLSpanElement;
+  const csvCopyButton = document.getElementById('csv-copy-button') as HTMLButtonElement;
+  const csvClearButton = document.getElementById('csv-clear-button') as HTMLButtonElement;
+
+  // Elementos compartidos
+  const tabButtons = document.querySelectorAll('.tab-button');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+  // Manejador de pestañas
+  tabButtons.forEach((button) => {
+    if (button instanceof HTMLButtonElement) {
+      button.addEventListener('click', () => {
+        const tabId = button.getAttribute('data-tab');
+        
+        // Actualizar botones
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        // Actualizar contenido
+        tabContents.forEach(content => {
+          const contentElement = content as HTMLElement;
+          contentElement.style.display = content.id === `${tabId}-tab` ? 'block' : 'none';
+        });
+      });
+    }
+  });
+
+  function sortLines(text: string, ascending: boolean = true): string[] {
+    return text
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .sort((a, b) => {
+        if (ascending) {
+          return a.localeCompare(b, 'es');
+        } else {
+          return b.localeCompare(a, 'es');
+        }
+      });
+  }
+
+  // Procesar texto normal
+  function processText(ascending: boolean) {
+    const text = textInput.value.trim();
+    if (!text) return;
+
+    const sortedLines = sortLines(text, ascending);
+    
+    // Actualizar estadísticas
+    lineCount.textContent = `${sortedLines.length} líneas ordenadas`;
+    
+    // Mostrar resultados
+    textOutput.value = sortedLines.join('\n');
+    outputSection.style.display = 'block';
+  }
+
+  // Procesar archivo CSV
+  function handleCSV(content: string, ascending: boolean = true) {
+    // Separar en líneas y limpiar espacios
+    const lines = content
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0);
+    
+    if (lines.length === 0) {
+      alert('El archivo está vacío');
+      return;
+    }
+
+    // Ordenar líneas
+    const sortedLines = lines.sort((a, b) => {
+      if (ascending) {
+        return a.localeCompare(b, 'es');
+      } else {
+        return b.localeCompare(a, 'es');
+      }
+    });
+    
+    // Actualizar estadísticas
+    csvLineCount.textContent = `${sortedLines.length} líneas ordenadas`;
+    
+    // Preparar CSV para descarga y visualización
+    const csvContent = sortedLines.join('\n');
+    
+    // Mostrar resultados
+    csvOutput.value = csvContent;
+    csvOutputSection.style.display = 'block';
+
+    // Configurar el botón de descarga
+    const downloadButton = document.getElementById('csv-download-button') as HTMLAnchorElement;
+    if (downloadButton) {
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      downloadButton.href = URL.createObjectURL(blob);
+      downloadButton.style.display = 'inline-flex';
+    }
+
+    // Configurar el botón de copiar CSV
+    if (csvCopyButton) {
+      csvCopyButton.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(csvContent);
+          csvCopyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+          setTimeout(() => {
+            csvCopyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+          }, 2000);
+        } catch (err) {
+          console.error('Error al copiar:', err);
+        }
+      };
+    }
+  }
+
+  // Event Listeners
+  if (sortAscButton && sortDescButton && copyButton) {
+    sortAscButton.addEventListener('click', () => processText(true));
+    sortDescButton.addEventListener('click', () => processText(false));
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textOutput.value);
+        copyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+        }, 2000);
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+  }
+
+  // Manejadores de archivos
+  if (fileInput && dropZone && csvClearButton) {
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = 'var(--color-primary)';
+      dropZone.style.backgroundColor = 'var(--card-gradient-bg)';
+    });
+
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '';
+      dropZone.style.backgroundColor = '';
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.style.borderColor = '';
+      dropZone.style.backgroundColor = '';
+
+      const file = e.dataTransfer?.files[0];
+      if (file) handleFile(file);
+    });
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files?.[0];
+      if (file) handleFile(file);
+    });
+
+    csvClearButton.addEventListener('click', () => {
+      fileInput.value = '';
+      csvOutput.value = '';
+      csvOutputSection.style.display = 'none';
+      csvLineCount.textContent = '0 líneas ordenadas';
+      const downloadButton = document.getElementById('csv-download-button') as HTMLAnchorElement;
+      if (downloadButton) {
+        downloadButton.style.display = 'none';
+        downloadButton.href = '#';
+      }
+    });
+  }
+
+  function handleFile(file: File) {
+    if (file.size > MAX_FILE_SIZE) {
+      alert('El archivo es demasiado grande. El tamaño máximo es 5MB.');
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith('.csv')) {
+      alert('Por favor selecciona un archivo CSV válido.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result;
+      if (typeof content === 'string') {
+        handleCSV(content);
+      }
+    };
+    reader.onerror = () => {
+      alert('Error al leer el archivo. Por favor intenta de nuevo.');
+    };
+    reader.readAsText(file);
+  }
+</script>
