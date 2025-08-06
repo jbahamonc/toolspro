@@ -1,0 +1,215 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Buscador y Reemplazador de Texto | TextoPro.lat";
+const description = "Busca y reemplaza texto en tus documentos de forma rápida y precisa. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Buscador y Reemplazador de Texto";
+const toolDescription = "Encuentra y reemplaza palabras o frases en tu texto de forma sencilla. Controla cada detalle del proceso.";
+---
+
+<Layout title={title} description={description}>
+  <div class="tool-container">
+    <ToolHeader
+      title={toolTitle}
+      description={toolDescription}
+      iconName="ph ph-file-search"
+    />
+
+    <section class="tool-content">
+      <div class="input-section">
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-input"
+            class="text-input"
+            placeholder="Pega aquí el texto original..."
+            rows="8"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="search-replace-section">
+        <div class="input-group">
+          <div class="field-wrapper">
+            <label for="search-text" class="field-label">Buscar texto</label>
+            <input 
+              type="text" 
+              id="search-text"
+              class="field-input"
+              placeholder="Texto a buscar..."
+            >
+          </div>
+
+          <div class="field-wrapper">
+            <label for="replace-text" class="field-label">Reemplazar con</label>
+            <input 
+              type="text" 
+              id="replace-text"
+              class="field-input"
+              placeholder="Texto de reemplazo..."
+            >
+          </div>
+        </div>
+
+        <div class="options-group">
+          <h3 class="options-title">Opciones</h3>
+          <div class="checkbox-group">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="match-case">
+              <span class="checkbox-label">Coincidir mayúsculas y minúsculas</span>
+            </label>
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="replace-first">
+              <span class="checkbox-label">Reemplazar solo la primera ocurrencia</span>
+            </label>
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="whole-word">
+              <span class="checkbox-label">Coincidir palabra completa</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button id="replace-button" class="action-button primary">
+            <i class="ph ph-arrows-clockwise"></i>
+            Reemplazar Todo
+          </button>
+          <button id="reset-button" class="action-button">
+            <i class="ph ph-eraser"></i>
+            Reiniciar
+          </button>
+        </div>
+      </div>
+
+      <div class="output-section" style="display: none;">
+        <div class="output-header">
+          <div class="output-stats">
+            <span id="replace-count" class="stat">0 ocurrencias reemplazadas</span>
+          </div>
+          <button id="copy-button" class="button-copy" title="Copiar al portapapeles">
+            <i class="ph ph-copy"></i>
+            Copiar texto
+          </button>
+        </div>
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-output"
+            class="text-input output"
+            placeholder="El texto resultante aparecerá aquí..."
+            rows="8"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
+  const textOutput = document.getElementById('text-output') as HTMLTextAreaElement;
+  const searchText = document.getElementById('search-text') as HTMLInputElement;
+  const replaceText = document.getElementById('replace-text') as HTMLInputElement;
+  const matchCase = document.getElementById('match-case') as HTMLInputElement;
+  const replaceFirst = document.getElementById('replace-first') as HTMLInputElement;
+  const wholeWord = document.getElementById('whole-word') as HTMLInputElement;
+  const replaceButton = document.getElementById('replace-button') as HTMLButtonElement;
+  const resetButton = document.getElementById('reset-button') as HTMLButtonElement;
+  const copyButton = document.getElementById('copy-button') as HTMLButtonElement;
+  const outputSection = document.querySelector('.output-section') as HTMLElement;
+  const replaceCount = document.getElementById('replace-count') as HTMLSpanElement;
+
+  function performReplace() {
+    const text = textInput.value;
+    const search = searchText.value;
+    const replace = replaceText.value;
+
+    // Ocultar la sección de salida si no hay texto o término de búsqueda
+    if (!text || !search) {
+      outputSection.style.display = 'none';
+      return;
+    }
+
+    let flags = 'g';
+    if (!matchCase.checked) flags += 'i';
+
+    let searchPattern = search;
+    if (wholeWord.checked) {
+      searchPattern = `\\b${search}\\b`;
+    }
+
+    const regex = new RegExp(searchPattern, flags);
+    let result;
+
+    // Función de reemplazo que preserva las mayúsculas/minúsculas del texto original
+    const replaceFunction = (match: string) => {
+      if (!matchCase.checked) {
+        // Copiar el patrón de mayúsculas/minúsculas del texto encontrado
+        return replace.split('').map((char, i) => {
+          return i < match.length && match[i] === match[i].toUpperCase() 
+            ? char.toUpperCase() 
+            : char.toLowerCase();
+        }).join('');
+      }
+      return replace;
+    };
+
+    if (replaceFirst.checked) {
+      // Quitamos la bandera 'g' para reemplazar solo la primera ocurrencia
+      const singleRegex = new RegExp(searchPattern, flags.replace('g', ''));
+      result = text.replace(singleRegex, replaceFunction);
+    } else {
+      result = text.replace(regex, replaceFunction);
+    }
+
+    // Contar ocurrencias reemplazadas
+    let occurrences = (text.match(regex) || []).length;
+    if (replaceFirst.checked && occurrences > 0) {
+      occurrences = 1; // Si solo reemplazamos la primera, solo contamos una
+    }
+    
+    // Mostrar resultados
+    textOutput.value = result;
+    outputSection.style.display = 'block';
+    replaceCount.textContent = `${occurrences} ocurrencias reemplazadas`;
+  }
+
+  function resetAll() {
+    // Limpiar campos de entrada
+    textInput.value = '';
+    searchText.value = '';
+    replaceText.value = '';
+    
+    // Desmarcar checkboxes
+    matchCase.checked = false;
+    replaceFirst.checked = false;
+    wholeWord.checked = false;
+    
+    // Limpiar salida
+    textOutput.value = '';
+    
+    // Ocultar sección de resultados
+    outputSection.style.display = 'none';
+    replaceCount.textContent = '0 ocurrencias reemplazadas';
+  }
+
+  // Event Listeners principales
+  if (replaceButton && copyButton && resetButton) {
+    replaceButton.addEventListener('click', performReplace);
+    resetButton.addEventListener('click', resetAll);
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textOutput.value);
+        copyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+        }, 2000);
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+  }
+</script>

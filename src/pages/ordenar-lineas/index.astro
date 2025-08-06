@@ -91,6 +91,17 @@ const toolDescription = "Organiza tu lista de texto en orden alfabético. Ordena
           </button>
         </div>
 
+        <div class="actions-group">
+          <button id="csv-sort-asc-button" class="action-button primary">
+            <i class="ph ph-sort-ascending"></i>
+            Ordenar A-Z
+          </button>
+          <button id="csv-sort-desc-button" class="action-button">
+            <i class="ph ph-sort-descending"></i>
+            Ordenar Z-A
+          </button>
+        </div>
+
         <div class="output-section" style="display: none; margin-top: 2rem;">
           <div class="output-header">
             <div class="output-stats">
@@ -140,6 +151,8 @@ const toolDescription = "Organiza tu lista de texto en orden alfabético. Ordena
   const csvLineCount = document.getElementById('csv-line-count') as HTMLSpanElement;
   const csvCopyButton = document.getElementById('csv-copy-button') as HTMLButtonElement;
   const csvClearButton = document.getElementById('csv-clear-button') as HTMLButtonElement;
+  const csvSortAscButton = document.getElementById('csv-sort-asc-button') as HTMLButtonElement;
+  const csvSortDescButton = document.getElementById('csv-sort-desc-button') as HTMLButtonElement;
 
   // Elementos compartidos
   const tabButtons = document.querySelectorAll('.tab-button');
@@ -265,6 +278,23 @@ const toolDescription = "Organiza tu lista de texto en orden alfabético. Ordena
         }, 2000);
       } catch (err) {
         console.error('Error al copiar:', err);
+      }
+    });
+  }
+
+  // Event listeners para botones de ordenamiento CSV
+  if (csvSortAscButton && csvSortDescButton) {
+    csvSortAscButton.addEventListener('click', () => {
+      const content = csvOutput.value;
+      if (content) {
+        handleCSV(content, true);
+      }
+    });
+
+    csvSortDescButton.addEventListener('click', () => {
+      const content = csvOutput.value;
+      if (content) {
+        handleCSV(content, false);
       }
     });
   }

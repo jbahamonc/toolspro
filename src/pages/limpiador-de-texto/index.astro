@@ -1,0 +1,155 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Limpiador de Texto | TextoPro.lat";
+const description = "Limpia y formatea tu texto eliminando caracteres no deseados, espacios extra y saltos de línea. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Limpiador de Texto";
+const toolDescription = "Elimina caracteres no deseados, espacios extra, saltos de línea de tu texto y mucho mas de forma rápida y sencilla.";
+---
+
+<Layout title={title} description={description}>
+  <div class="tool-container">
+    <ToolHeader
+      title={toolTitle}
+      description={toolDescription}
+      iconName="ph ph-eraser"
+    />
+
+    <section class="tool-content">
+      <div class="input-section">
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-input"
+            class="text-input"
+            placeholder="Pega aquí el texto que deseas limpiar..."
+            rows="8"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="config-section">
+        <div class="config-group">
+          <label for="chars-to-remove" class="config-label">Caracteres específicos a eliminar (Separados por coma)</label>
+          <input 
+            type="text" 
+            id="chars-to-remove"
+            class="config-input"
+            placeholder="Ej: ,.;#$"
+          >
+        </div>
+
+        <div class="config-group">
+          <label class="config-label">Acciones comunes</label>
+          <div class="checkbox-group">
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="remove-extra-spaces">
+              <span class="checkbox-label">Eliminar espacios extra</span>
+            </label>
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="remove-line-breaks">
+              <span class="checkbox-label">Eliminar saltos de línea</span>
+            </label>
+            <label class="checkbox-wrapper">
+              <input type="checkbox" id="trim-whitespace">
+              <span class="checkbox-label">Eliminar espacios al inicio y final</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="clean-button" class="action-button primary">
+          <i class="ph ph-eraser"></i>
+          Limpiar Texto
+        </button>
+      </div>
+
+      <div class="output-section" style="display: none;">
+        <div class="output-header">
+          <div class="output-stats">
+            <span id="char-count" class="stat">0 caracteres eliminados</span>
+          </div>
+          <button id="copy-button" class="button-copy" title="Copiar al portapapeles">
+            <i class="ph ph-copy"></i>
+            Copiar texto
+          </button>
+        </div>
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-output"
+            class="text-input output"
+            placeholder="El texto limpio aparecerá aquí..."
+            rows="8"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const textInput = document.getElementById('text-input') as HTMLTextAreaElement;
+  const textOutput = document.getElementById('text-output') as HTMLTextAreaElement;
+  const charsToRemove = document.getElementById('chars-to-remove') as HTMLInputElement;
+  const removeExtraSpaces = document.getElementById('remove-extra-spaces') as HTMLInputElement;
+  const removeLineBreaks = document.getElementById('remove-line-breaks') as HTMLInputElement;
+  const trimWhitespace = document.getElementById('trim-whitespace') as HTMLInputElement;
+  const cleanButton = document.getElementById('clean-button') as HTMLButtonElement;
+  const copyButton = document.getElementById('copy-button') as HTMLButtonElement;
+  const outputSection = document.querySelector('.output-section') as HTMLElement;
+  const charCount = document.getElementById('char-count') as HTMLSpanElement;
+
+  function cleanText() {
+    let text = textInput.value;
+    const originalLength = text.length;
+    
+    // Eliminar caracteres específicos
+    const chars = charsToRemove.value;
+    if (chars) {
+      const regex = new RegExp(`[${chars.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&')}]`, 'g');
+      text = text.replace(regex, '');
+    }
+
+    // Eliminar espacios extra
+    if (removeExtraSpaces.checked) {
+      text = text.replace(/\s+/g, ' ');
+    }
+
+    // Eliminar saltos de línea
+    if (removeLineBreaks.checked) {
+      text = text.replace(/\n/g, ' ');
+    }
+
+    // Eliminar espacios al inicio y final
+    if (trimWhitespace.checked) {
+      text = text.trim();
+    }
+
+    // Mostrar resultados
+    textOutput.value = text;
+    outputSection.style.display = 'block';
+    
+    // Actualizar estadísticas
+    const charactersRemoved = originalLength - text.length;
+    charCount.textContent = `${charactersRemoved} caracteres eliminados`;
+  }
+
+  // Event Listeners
+  if (cleanButton && copyButton) {
+    cleanButton.addEventListener('click', cleanText);
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textOutput.value);
+        copyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+        }, 2000);
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+  }
+</script>

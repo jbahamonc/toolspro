@@ -1,0 +1,242 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ToolHeader from '../../components/ToolHeader.astro';
+import '../../styles/global.css';
+import './styles.css';
+
+const title = "Generador de Lorem Ipsum | TextoPro.lat";
+const description = "Genera texto de relleno Lorem Ipsum personalizado para tus diseños y maquetas. Herramienta gratuita y fácil de usar.";
+const toolTitle = "Generador de Lorem Ipsum";
+const toolDescription = "Crea texto de relleno personalizado. Define la cantidad, el formato y otras opciones para generar el contenido que necesitas.";
+---
+
+<Layout title={title} description={description}>
+  <div class="tool-container">
+    <ToolHeader
+      title={toolTitle}
+      description={toolDescription}
+      iconName="ph ph-text-t"
+    />
+
+    <section class="tool-content">
+      <div class="options-section">
+        <div class="options-wrapper">
+          <div class="input-group">
+            <label for="amount" class="field-label">Cantidad</label>
+            <div class="number-input-wrapper">
+              <input 
+                type="number" 
+                id="amount"
+                class="field-input"
+                min="1"
+                max="1000"
+                value="5"
+              >
+            </div>
+          </div>
+
+          <div class="options-group">
+            <h3 class="options-title">Tipo de generación</h3>
+            <div class="radio-group">
+              <label class="radio-wrapper">
+                <input 
+                  type="radio" 
+                  name="type" 
+                  value="paragraphs" 
+                  checked
+                >
+                <span class="radio-label">Párrafos</span>
+              </label>
+              <label class="radio-wrapper">
+                <input 
+                  type="radio" 
+                  name="type" 
+                  value="words"
+                >
+                <span class="radio-label">Palabras</span>
+              </label>
+              <label class="radio-wrapper">
+                <input 
+                  type="radio" 
+                  name="type" 
+                  value="lists"
+                >
+                <span class="radio-label">Listas</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-wrapper">
+              <input 
+                type="checkbox" 
+                id="start-with-lorem" 
+                checked
+              >
+              <span class="checkbox-label">Comenzar con "Lorem ipsum dolor sit amet..."</span>
+            </label>
+          </div>
+
+          <div class="button-group">
+            <button id="generate-button" class="action-button primary">
+              <i class="ph ph-arrows-clockwise"></i>
+              Generar
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="output-section">
+        <div class="output-header">
+          <button id="copy-button" class="button-copy" title="Copiar al portapapeles">
+            <i class="ph ph-copy"></i>
+            Copiar texto
+          </button>
+        </div>
+        <div class="textarea-wrapper">
+          <textarea 
+            id="text-output"
+            class="text-input output"
+            placeholder="El texto generado aparecerá aquí..."
+            rows="12"
+            readonly
+          ></textarea>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  const amountInput = document.getElementById('amount') as HTMLInputElement;
+  const typeInputs = document.getElementsByName('type') as NodeListOf<HTMLInputElement>;
+  const startWithLoremCheckbox = document.getElementById('start-with-lorem') as HTMLInputElement;
+  const generateButton = document.getElementById('generate-button') as HTMLButtonElement;
+  const copyButton = document.getElementById('copy-button') as HTMLButtonElement;
+  const textOutput = document.getElementById('text-output') as HTMLTextAreaElement;
+
+  // Event Listeners principales
+  if (generateButton && copyButton) {
+    generateButton.addEventListener('click', generateLoremIpsum);
+
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(textOutput.value);
+        copyButton.innerHTML = '<i class="ph ph-check"></i> ¡Copiado!';
+        setTimeout(() => {
+          copyButton.innerHTML = '<i class="ph ph-copy"></i> Copiar texto';
+        }, 2000);
+      } catch (err) {
+        console.error('Error al copiar:', err);
+      }
+    });
+  }
+
+  const LOREM_FULL = "Lorem ipsum dolor sit amet consectetur adipiscing elit";
+  const LOREM_START = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  const WORDS = [
+    "a", "ac", "accumsan", "ad", "adipiscing", "aenean", "aliquam", "aliquet", "amet", "ante", 
+    "aptent", "arcu", "at", "auctor", "augue", "bibendum", "blandit", "class", "commodo", "condimentum", 
+    "congue", "consectetur", "consequat", "conubia", "convallis", "cras", "cubilia", "curabitur", "curae", 
+    "cursus", "dapibus", "diam", "dictum", "dictumst", "dignissim", "dis", "dolor", "donec", "dui", "duis", 
+    "egestas", "eget", "eleifend", "elementum", "elit", "enim", "erat", "eros", "est", "et", "etiam", "eu", 
+    "euismod", "facilisi", "facilisis", "fames", "faucibus", "felis", "fermentum", "feugiat", "fringilla", 
+    "fusce", "gravida", "habitant", "habitasse", "hac", "hendrerit", "himenaeos", "iaculis", "id", "imperdiet", 
+    "in", "inceptos", "integer", "interdum", "ipsum", "justo", "lacinia", "lacus", "laoreet", "lectus", "leo", 
+    "libero", "ligula", "litora", "lobortis", "lorem", "luctus", "maecenas", "magna", "malesuada", "massa", 
+    "mattis", "mauris", "metus", "mi", "molestie", "mollis", "morbi", "nam", "nec", "neque", "netus", "nibh", 
+    "nisi", "nisl", "non", "nostra", "nulla", "nullam", "nunc", "odio", "orci", "ornare", "parturient", "pellentesque", 
+    "per", "pharetra", "phasellus", "placerat", "platea", "porta", "porttitor", "posuere", "potenti", "praesent", 
+    "pretium", "primis", "proin", "pulvinar", "purus", "quam", "quis", "quisque", "rhoncus", "risus", "rutrum", 
+    "sagittis", "sapien", "scelerisque", "sed", "sem", "semper", "senectus", "sit", "sociosqu", "sodales", 
+    "sollicitudin", "suscipit", "suspendisse", "taciti", "tellus", "tempor", "tempus", "tincidunt", "torquent", 
+    "tortor", "tristique", "turpis", "ullamcorper", "ultrices", "ultricies", "urna", "ut", "varius", "vehicula", 
+    "vel", "velit", "venenatis", "vestibulum", "vitae", "vivamus", "viverra", "volutpat", "vulputate"
+  ];
+
+  function getRandomWords(count: number): string {
+    let words: string[] = [];
+    for (let i = 0; i < count; i++) {
+      words.push(WORDS[Math.floor(Math.random() * WORDS.length)]);
+    }
+    return words.join(' ');
+  }
+
+  function generateParagraph(startWithLorem: boolean): string {
+    const wordsPerSentence = Math.floor(Math.random() * 6) + 10; // 10-15 palabras por oración
+    const sentencesPerParagraph = Math.floor(Math.random() * 3) + 3; // 3-5 oraciones por párrafo
+    let sentences: string[] = [];
+
+    for (let i = 0; i < sentencesPerParagraph; i++) {
+      let sentence = '';
+      if (i === 0 && startWithLorem) {
+        sentence = LOREM_START;
+        startWithLorem = false; // Solo usar Lorem start una vez
+      } else {
+        sentence = getRandomWords(wordsPerSentence);
+        // Capitalize first letter
+        sentence = sentence.charAt(0).toUpperCase() + sentence.slice(1);
+      }
+      sentences.push(sentence + '.');
+    }
+
+    return sentences.join(' ');
+  }
+
+  function generateLoremIpsum() {
+    const amount = Number(amountInput.value);
+    const type = Array.from(typeInputs).find(input => input.checked)?.value || 'paragraphs';
+    const startWithLorem = startWithLoremCheckbox.checked;
+    
+    let result = '';
+
+    switch (type) {
+      case 'paragraphs':
+        for (let i = 0; i < amount; i++) {
+          result += generateParagraph(i === 0 && startWithLorem) + '\n\n';
+        }
+        break;
+
+      case 'words':
+        if (startWithLorem) {
+          const loremWords = LOREM_FULL.split(' ');
+          if (amount <= loremWords.length) {
+            // Si la cantidad solicitada es menor o igual a las palabras disponibles en Lorem,
+            // usar solo las primeras 'amount' palabras
+            result = loremWords.slice(0, amount).join(' ');
+          } else {
+            // Si necesitamos más palabras, agregar palabras aleatorias después del Lorem
+            result = LOREM_START + ' ' + getRandomWords(amount - loremWords.length);
+          }
+        } else {
+          result = getRandomWords(amount);
+        }
+        break;
+
+      case 'lists':
+        // Generar entre 1 y 5 items por lista
+        for (let listIndex = 0; listIndex < amount; listIndex++) {
+          const itemsInList = Math.floor(Math.random() * 5) + 1; // 1-5 items por lista
+          
+          for (let itemIndex = 0; itemIndex < itemsInList; itemIndex++) {
+            if (listIndex === 0 && itemIndex === 0 && startWithLorem) {
+              // Si es el primer ítem de la primera lista y está marcada la opción de Lorem
+              result += "• " + LOREM_START + '\n';
+            } else {
+              // Para los demás items, generar una frase aleatoria
+              const wordsPerSentence = Math.floor(Math.random() * 6) + 10; // 10-15 palabras por frase
+              const sentence = getRandomWords(wordsPerSentence);
+              result += "• " + sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.\n';
+            }
+          }
+          // Agregar línea en blanco entre listas, excepto después de la última
+          if (listIndex < amount - 1) {
+            result += '\n';
+          }
+        }
+        break;
+    }
+
+    textOutput.value = result.trim();
+  }
+</script>
