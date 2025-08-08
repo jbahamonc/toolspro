@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Página principal -->
+  <url>
+    <loc>https://suitetools.online/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Contador de Palabras -->
+  <url>
+    <loc>https://suitetools.online/contador-de-palabras/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Convertidor de Mayúsculas -->
+  <url>
+    <loc>https://suitetools.online/convertidor-mayusculas/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Eliminar Duplicados -->
+  <url>
+    <loc>https://suitetools.online/eliminar-duplicados/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Ordenar Líneas -->
+  <url>
+    <loc>https://suitetools.online/ordenar-lineas/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Limpiador de Texto -->
+  <url>
+    <loc>https://suitetools.online/limpiador-de-texto/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Reemplazar Texto -->
+  <url>
+    <loc>https://suitetools.online/reemplazar-texto/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Generador Lorem Ipsum -->
+  <url>
+    <loc>https://suitetools.online/generador-lorem-ipsum/</loc>
+    <lastmod>2025-08-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>

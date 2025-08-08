@@ -1,0 +1,26 @@
+# https://suitetools.online/robots.txt
+# Permite a todos los robots de búsqueda rastrear e indexar el sitio
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://www.suitetools.online/sitemap.xml
+
+# Directorios y archivos específicos a no rastrear
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+Disallow: /*.js$
+Disallow: /*.css$
+
+# Reglas específicas para bots principales
+User-agent: Googlebot
+Allow: /*.js$
+Allow: /*.css$
+
+User-agent: Bingbot
+Allow: /*.js$
+Allow: /*.css$
+
+# Tasa de rastreo
+Crawl-delay: 1

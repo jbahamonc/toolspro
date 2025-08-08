@@ -4,6 +4,24 @@ import ToolCard from '../components/ToolCard.astro';
 import FAQSection from '../components/FAQSection.astro';
 import '../styles/global.css';
 
+const title = "SuiteTools - Herramientas gratuitas para manipular texto";
+const description = "Colección de herramientas gratuitas y fáciles de usar para manipular texto: contador de palabras, convertidor de mayúsculas, eliminador de duplicados y más.";
+
+// Structured data for rich results
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "SuiteTools",
+  "description": description,
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Web",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  }
+};
+
 const tools = [
   {
     title: 'Contador de Palabras',
@@ -70,11 +88,14 @@ const faqs = [
   }
 ];
 
-const title = "Suite Tools | Herramientas Online Gratuitas";
-const description = "Herramientas online gratuitas: contador de palabras, convertidor de mayúsculas, eliminar duplicados y más. ¡Rápido y fácil de usar!";
+
 ---
 
-<Layout title={title} description={description}>
+<Layout 
+  title={title} 
+  description={description} 
+  showHero={true}
+>
     <section class="tools-section">
       <h2>Herramientas de <span class="highlight">Texto</span></h2>
       <div class="tools-grid">
